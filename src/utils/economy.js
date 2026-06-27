@@ -40,8 +40,9 @@ export function getMaxBankCapacity(userData) {
     const upgrades = userData.upgrades || {};
     const inventory = userData.inventory || {};
 
-    if (upgrades['bank_upgrade_1']) {
-        capacity = Math.floor(capacity * 1.5);
+    const bankUpgradeLevel = Number(upgrades['bank_upgrade_1'] || 0);
+    if (bankUpgradeLevel > 0) {
+        capacity = Math.floor(capacity * Math.pow(1.5, bankUpgradeLevel));
     }
 
     const bankNotes = inventory['bank_note'] || 0;
