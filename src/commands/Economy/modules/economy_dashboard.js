@@ -114,21 +114,11 @@ async function updateConfigFile(currencySymbol, currencyName) {
         const configPath = path.join(__dirname, '../../config/bot.js');
         let configContent = await fs.readFile(configPath, 'utf-8');
 
-        configContent = configContent.replace(
-            /symbol:\s*"[^"]*"/,
-            `symbol: "${currencySymbol}"`
-        );
+        configContent = replaceCurrencyValue(configContent, 'symbol', currencySymbol);
+        configContent = replaceCurrencyValue(configContent, 'name', currencyName);
+        configContent = replaceCurrencyValue(configContent, 'namePlural', `${currencyName}s`);
 
-        configContent = configContent.replace(
-            /name:\s*"[^"]*",\s*\/\/\s*Currency display name/,
-            `name: "${currencyName}", // Currency display name`
-        );
 
-        configContent = configContent.replace(
-            /namePlural:\s*"[^"]*",\s*\/\/\s*Plural display name/,
-            `namePlural: "${currencyName}s", // Plural display name`
-        );
-        
         await fs.writeFile(configPath, configContent, 'utf-8');
         logger.info('Config file updated successfully');
         return true;
@@ -136,6 +126,16 @@ async function updateConfigFile(currencySymbol, currencyName) {
         logger.error('Error updating config file:', error);
         return false;
     }
+}
+
+function replaceCurrencyValue(content, key, newValue) {
+    const currencyBlockRegex = new RegExp(`(currency:\\s*{[\\s\\S]*?\\b${key}:\\s*)"[^"]*"`, 'm');
+    if (currencyBlockRegex.test(content)) {
+        return content.replace(currencyBlockRegex, `$1"${newValue}"`);
+    }
+
+    const genericRegex = new RegExp(`(\\b${key}:\\s*)"[^"]*"`, 'm');
+    return content.replace(genericRegex, `$1"${newValue}"`);
 }
 
 export default {
