@@ -111,7 +111,7 @@ async function refreshDashboard(rootInteraction, guild, client) {
 
 async function updateConfigFile(currencySymbol, currencyName) {
     try {
-        const configPath = path.join(__dirname, '../../config/bot.js');
+        const configPath = path.join(__dirname, '../../../config/bot.js');
         let configContent = await fs.readFile(configPath, 'utf-8');
 
         configContent = replaceCurrencyValue(configContent, 'symbol', currencySymbol);
