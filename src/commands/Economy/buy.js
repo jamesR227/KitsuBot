@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, MessageFlags } from 'discord.js';
 import { createEmbed, errorEmbed, successEmbed, infoEmbed, warningEmbed } from '../../utils/embeds.js';
-import { shopItems } from '../../config/shop/items.js';
+import { shopItems, validatePurchase } from '../../config/shop/items.js';
 import { getEconomyData, setEconomyData } from '../../utils/economy.js';
 import { getGuildConfig } from '../../services/guildConfig.js';
 import { withErrorHandling, createError, ErrorTypes } from '../../utils/errorHandler.js';
@@ -62,6 +62,16 @@ export default {
             const PREMIUM_ROLE_ID = guildConfig.premiumRoleId;
 
             const userData = await getEconomyData(client, guildId, userId);
+
+            const purchaseValidation = validatePurchase(itemId, userData, quantity);
+            if (!purchaseValidation.valid) {
+                throw createError(
+                    "Purchase not allowed",
+                    ErrorTypes.VALIDATION,
+                    purchaseValidation.reason,
+                    { itemId, quantity }
+                );
+            }
 
             if (userData.wallet < totalCost) {
                 throw createError(
@@ -134,9 +144,9 @@ export default {
                     );
                 }
             } else if (item.type === "upgrade") {
-                userData.upgrades[itemId] = true;
-                successDescription += `\n\n**✨ Your upgrade is now active!**`;
-            } else if (item.type === "consumable") {
+                userData.upgrades[itemId] = (userData.upgrades[itemId] || 0) + quantity;
+                successDescription += `\n\n**✨ Your upgrade is now active at level ${userData.upgrades[itemId]}!**`;
+            } else if (item.type === "tool" || item.type === "consumable") {
                 userData.inventory[itemId] =
                     (userData.inventory[itemId] || 0) + quantity;
             }
