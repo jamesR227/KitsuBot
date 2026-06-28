@@ -6,21 +6,19 @@ import { logger } from '../../utils/logger.js';
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 
 const WORK_COOLDOWN = 10000;
-const MIN_WORK_AMOUNT = 50;
-const MAX_WORK_AMOUNT = 300;
+const MIN_WORK_AMOUNT = 10000;
+const MAX_WORK_AMOUNT = 30000;
 const LAPTOP_MULTIPLIER = 1.5;
 const WORK_JOBS = [
     "Software Developer",
     "Barista",
     "Janitor",
     "YouTuber",
-    "Discord Bot Developer",
-    "Cashier",
     "Pizza Delivery Driver",
     "Librarian",
     "Gardener",
     "Data Analyst",
-    "Getting abducted to my basement",
+    "Basement Mod for Karama",
 ];
 
 export default {
