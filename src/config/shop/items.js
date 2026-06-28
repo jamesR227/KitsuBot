@@ -17,9 +17,9 @@ cooldown: 86400000,
         id: 'bank_upgrade_1',
         name: 'Bank Upgrade I',
         price: 15000,
-        description: 'Increases bank capacity and allows more funds to be deposited.',
+        description: 'Increases bank capacity and allows more funds to be deposited. Can be purchased multiple times (effect caps at level 20).',
         type: 'upgrade',
-        maxLevel: 5,
+        
         effect: {
             type: 'bank_capacity',
             multiplier: 1.5
@@ -150,18 +150,19 @@ export function getItemPrice(itemId) {
     return item ? item.price : 0;
 }
 
-export function validatePurchase(itemId, userData) {
+export function validatePurchase(itemId, userData, quantity = 1) {
     const item = getItemById(itemId);
     if (!item) {
         return { valid: false, reason: 'Item not found' };
     }
 
+    const purchaseQuantity = Math.max(1, quantity || 1);
     const inventory = userData.inventory || {};
     const upgrades = userData.upgrades || {};
 
     if (item.type === 'consumable' && item.maxQuantity) {
         const currentQuantity = inventory[itemId] || 0;
-        if (currentQuantity >= item.maxQuantity) {
+        if (currentQuantity + purchaseQuantity > item.maxQuantity) {
             return { 
                 valid: false, 
                 reason: `You can only have a maximum of ${item.maxQuantity} ${item.name}s` 
@@ -170,17 +171,16 @@ export function validatePurchase(itemId, userData) {
     }
 
     if (item.type === 'upgrade' && item.maxLevel) {
-        
-        if (upgrades[itemId]) {
+        const currentLevel = upgrades[itemId] || 0;
+        if (currentLevel + purchaseQuantity > item.maxLevel) {
             return { 
                 valid: false, 
-                reason: `You've already purchased ${item.name}` 
+                reason: `You can only purchase ${item.name} up to level ${item.maxLevel}` 
             };
         }
     }
 
     if (item.type === 'tool') {
-        
         const currentQuantity = inventory[itemId] || 0;
         if (itemId !== 'bank_note' && currentQuantity > 0) {
             return { 
