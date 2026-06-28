@@ -11,7 +11,7 @@ export default {
         .addIntegerOption(option =>
             option
                 .setName('amount')
-                .setDescription('Amount to withdraw')
+                .setDescription('Amount to withdraw (number or "all")')
                 .setRequired(true)
                 .setMinValue(1)
         ),
